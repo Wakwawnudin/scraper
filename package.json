@@ -1,11 +1,13 @@
 {
-  "name": "fb-hunter",
+  "name": "fb-hunter-pro",
   "version": "1.0.0",
-  "description": "Bot pencari villa facebook",
+  "description": "Bot Scraper FB to WA",
   "main": "fb-hunter.js",
   "dependencies": {
     "puppeteer": "^23.0.0",
     "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "whatsapp-web.js": "^1.26.0",
+    "qrcode-terminal": "^0.12.0"
   }
 }

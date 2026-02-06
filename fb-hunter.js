@@ -5,15 +5,15 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 
 puppeteer.use(StealthPlugin());
 
-// 👇 GANTI NOMOR INI DENGAN WA ANDA SENDIRI (Format: 628...)
+// 👇 NOMOR ANDA SUDAH DIPERBARUI (Format Internasional)
 const NOMOR_TUJUAN = '6283146289435@c.us'; 
-// 👆 Pastikan formatnya benar (tanpa 0 di depan, pakai 62)
 
 const TARGET_FB_URL = 'https://www.facebook.com/groups/ubudcommunity/search/?q=looking%20for%20villa';
 const KEYWORDS = ['monthly', 'long term', 'year', 'budget', 'looking for'];
 
 console.log('🔄 Menghidupkan Mesin WhatsApp...');
 
+// Gunakan LocalAuth agar tidak perlu scan ulang terus menerus (kecuali di Codespaces baru)
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
@@ -23,13 +23,14 @@ const client = new Client({
 });
 
 client.on('qr', (qr) => {
-    console.log('⚠️ SCAN QR CODE DI BAWAH INI DENGAN WA ANDA:');
+    console.log('⚠️ SCAN QR CODE DI BAWAH INI DENGAN WA ANDA (Linked Devices):');
     qrcode.generate(qr, { small: true });
 });
 
 client.on('ready', () => {
     console.log('✅ WhatsApp Terhubung!');
-    client.sendMessage(NOMOR_TUJUAN, '🤖 Bot Aktif! Sedang memantau Facebook...');
+    // Kirim pesan tes ke nomor Anda sendiri
+    client.sendMessage(NOMOR_TUJUAN, '🤖 Bot Aktif! Sedang memantau Facebook untuk Bos Yusron...');
     jalankanScraper();
 });
 
@@ -44,14 +45,14 @@ async function jalankanScraper() {
     });
 
     const page = await browser.newPage();
-    // Set ukuran layar HP
+    // Set ukuran layar HP iPhone X
     await page.setViewport({ width: 375, height: 812 }); 
 
     try {
         await page.goto(TARGET_FB_URL, { waitUntil: 'networkidle2', timeout: 60000 });
         
         console.log('⬇️ Scrolling halaman...');
-        // Scroll 5 kali
+        // Scroll 5 kali pelan-pelan
         for(let i=0; i<5; i++){
              await page.evaluate(() => window.scrollBy(0, window.innerHeight));
              await new Promise(r => setTimeout(r, 2000));
@@ -63,7 +64,7 @@ async function jalankanScraper() {
             let results = [];
             divs.forEach(el => {
                 let text = el.innerText;
-                // Ambil yg panjangnya wajar untuk postingan
+                // Filter teks sampah, ambil yang panjangnya wajar untuk postingan
                 if (text && text.length > 50 && text.length < 500) {
                     results.push(text);
                 }
@@ -71,23 +72,27 @@ async function jalankanScraper() {
             return [...new Set(results)]; // Hapus duplikat
         });
 
-        console.log(`🌾 Dapat ${leads.length} data mentah.`);
+        console.log(`🌾 Mendapat ${leads.length} data mentah.`);
         
         let sentCount = 0;
         for (const postText of leads) {
             const isMatch = KEYWORDS.some(k => postText.toLowerCase().includes(k));
             
             if (isMatch) {
-                const pesan = `🔥 *LEAD BARU* 🔥\n\n${postText.substring(0, 200)}...\n\n(Cek Grup FB)`;
+                const pesan = `🔥 *LEAD BARU* 🔥\n\n${postText.substring(0, 300)}...\n\n(Cek Grup FB)`;
                 await client.sendMessage(NOMOR_TUJUAN, pesan);
                 console.log(`📤 Terkirim ke WA.`);
                 sentCount++;
-                await new Promise(r => setTimeout(r, 3000)); // Jeda 3 detik
+                await new Promise(r => setTimeout(r, 4000)); // Jeda 4 detik biar aman
             }
         }
         
         if(sentCount === 0) {
-             console.log("⚠️ Tidak ada lead cocok kali ini.");
+             console.log("⚠️ Tidak ada lead yang cocok kali ini.");
+             // Opsional: Kirim laporan kosong biar tau bot jalan
+             // await client.sendMessage(NOMOR_TUJUAN, 'Laporan: Belum ada lead baru.'); 
+        } else {
+             console.log(`✅ Selesai! Mengirim ${sentCount} leads.`);
         }
 
     } catch (error) {

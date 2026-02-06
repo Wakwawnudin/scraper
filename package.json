@@ -1,0 +1,11 @@
+{
+  "name": "fb-hunter",
+  "version": "1.0.0",
+  "description": "Bot pencari villa facebook",
+  "main": "fb-hunter.js",
+  "dependencies": {
+    "puppeteer": "^23.0.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}
